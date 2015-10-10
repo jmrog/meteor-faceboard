@@ -5,7 +5,7 @@ Tracker.autorun(function() {
 });
 
 function insertCircle(x, y) {
-    CirclePoints.insert({
+    Meteor.call('insertCirclePoint', {
         x: x - canvasContainerOffset.left,
         y: y - canvasContainerOffset.top
     });
