@@ -27,9 +27,10 @@ Template.svgCanvas.events({
         evt.preventDefault();
         evt.stopPropagation();
 
-        Meteor.call('clearCanvas');
-        d3.select('#svgCanvasContainer svg').remove();
-        d3.select('#svgCanvasContainer').append('svg').attr('width', 500).attr('height', 500);
+        Meteor.call('clearCanvas', function() {
+            d3.select('#svgCanvasContainer svg').remove();
+            d3.select('#svgCanvasContainer').append('svg').attr('width', 500).attr('height', 500);
+        });
     }
 });
 
