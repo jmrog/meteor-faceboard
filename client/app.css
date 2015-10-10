@@ -2,3 +2,35 @@
 .spacing {
   margin-top: 35px;
 }
+
+.black {
+  background-color: black;
+  color: white;
+}
+
+.white {
+  background-color: white;
+}
+
+.red {
+  background-color: red;
+
+}
+
+.orange{
+  background-color: orange;
+
+}
+
+.yellow {
+  background-color: yellow;
+
+}
+.blue {
+  background-color: blue;
+
+}
+.green {
+  background-color: green;
+
+}
