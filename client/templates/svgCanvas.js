@@ -12,6 +12,12 @@ function insertCircle(x, y, lineColor) {
     });
 }
 
+Template.svgCanvas.onRendered(function() {
+    d3.select('#svgCanvasContainer').append('svg').attr('width', 500).attr('height', 500);
+    Session.set('svgCanvasContainerOffset', $('#svgCanvasContainer').offset());
+    Session.set('lineColor', 'black');
+});
+
 Template.svgCanvas.events({
     'mousedown #svgCanvasContainer': function() {
         Session.set('isDrawing', true);
@@ -29,7 +35,6 @@ Template.svgCanvas.events({
         evt.stopPropagation();
 
         switch  (evt.target.id) {
-
             case "clear":
                 Meteor.call('clearCanvas', function () {
                     d3.select('#svgCanvasContainer svg').remove();
@@ -45,7 +50,6 @@ Template.svgCanvas.events({
 
             default:
                 Session.set('lineColor', evt.target.id);
-
         }
     }
 });
