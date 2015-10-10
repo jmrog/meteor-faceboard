@@ -1,9 +1,11 @@
+/*** SETUP ***/
 var canvasContainerOffset = Session.get('svgCanvasContainerOffset');
 
 Tracker.autorun(function() {
     canvasContainerOffset = Session.get('svgCanvasContainerOffset');
 });
 
+/*** UTILITY METHODS ***/
 function insertCircle(x, y, lineColor) {
     Meteor.call('insertCirclePoint', {
         x: x - canvasContainerOffset.left,
@@ -12,12 +14,17 @@ function insertCircle(x, y, lineColor) {
     });
 }
 
-Template.svgCanvas.onRendered(function() {
+function resetCanvas() {
+    d3.select('#svgCanvasContainer svg').remove();
     d3.select('#svgCanvasContainer').append('svg').attr('width', 500).attr('height', 500);
     Session.set('svgCanvasContainerOffset', $('#svgCanvasContainer').offset());
     Session.set('lineColor', 'black');
-});
+}
 
+/*** ONRENDERED ***/
+Template.svgCanvas.onRendered(resetCanvas);
+
+/*** EVENTS ***/
 Template.svgCanvas.events({
     'mousedown #svgCanvasContainer': function() {
         Session.set('isDrawing', true);
@@ -36,15 +43,18 @@ Template.svgCanvas.events({
 
         switch  (evt.target.id) {
             case "clear":
-                Meteor.call('clearCanvas', function () {
-                    d3.select('#svgCanvasContainer svg').remove();
-                    d3.select('#svgCanvasContainer').append('svg').attr('width', 500).attr('height', 500);
-                });
+                Meteor.call('clearCanvas', resetCanvas);
                 break;
 
             case "save":
                 Meteor.call('saveCanvas', function(err, canvasId) {
-                    alert('Saved canvas with id: ' + canvasId);
+                    if (err) {
+                        // TODO: Do something here.
+                        return;
+                    }
+
+                    Alerts.set('Your wall has been saved. Use (or bookmark) the URL in the browser bar to return to this wall in the future.');
+                    FlowRouter.go('/wall/' + canvasId);
                 });
                 break;
 
