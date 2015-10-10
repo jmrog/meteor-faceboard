@@ -36,8 +36,8 @@ Template.svgCanvas.events({
         evt.preventDefault();
         evt.stopPropagation();
 
-        Meteor.call('saveCanvas', function() {
-            alert('Save finished');
+        Meteor.call('saveCanvas', function(err, canvasId) {
+            alert('Saved canvas with id: ' + canvasId);
         });
     }
 });
