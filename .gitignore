@@ -1,2 +1,7 @@
 .meteor/local
 .meteor/meteorite
+*.un~
+*.swp
+.DS_Store
+.idea
+
