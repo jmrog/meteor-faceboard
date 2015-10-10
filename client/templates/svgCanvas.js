@@ -22,6 +22,14 @@ Template.svgCanvas.events({
         if (Session.get('isDrawing')) {
             insertCircle(evt.pageX, evt.pageY);
         }
+    },
+    'click button': function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+
+        Meteor.call('clearCanvas');
+        d3.select('#svgCanvasContainer svg').remove();
+        d3.select('#svgCanvasContainer').append('svg').attr('width', 500).attr('height', 500);
     }
 });
 
