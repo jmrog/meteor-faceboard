@@ -23,13 +23,21 @@ Template.svgCanvas.events({
             insertCircle(evt.pageX, evt.pageY);
         }
     },
-    'click button': function(evt) {
+    'click button#clear': function(evt) {
         evt.preventDefault();
         evt.stopPropagation();
 
-        Meteor.call('clearCanvas', function() {
+        Meteor.call('clearCanvas', function () {
             d3.select('#svgCanvasContainer svg').remove();
             d3.select('#svgCanvasContainer').append('svg').attr('width', 500).attr('height', 500);
+        });
+    },
+    'click button#save': function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+
+        Meteor.call('saveCanvas', function() {
+            alert('Save finished');
         });
     }
 });
