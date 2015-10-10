@@ -53,7 +53,7 @@ Template.svgCanvas.events({
                         return;
                     }
 
-                    Alerts.set('Your wall has been saved. Use (or bookmark) the URL in the browser bar to return to this wall in the future.');
+                    Alerts.set('Your wall has been saved. Use (or bookmark) the URL in the browser bar to return to this wall in the future.', 'success');
                     FlowRouter.go('/wall/' + canvasId);
                 });
                 break;
