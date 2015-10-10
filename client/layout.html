@@ -20,11 +20,10 @@
    {{> topNav }} 
 
     <main>
-      {{> main }}
+      {{>Template.dynamic template = mainContent}}
     </main>  
   </body>
 </template>
-
 
 
 <template name = "topNav">
@@ -37,13 +36,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">GraffitiWall</a>
+          <a class="navbar-brand" href="/">GraffitiWall</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
            
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li> <a href="{{pathFor 'about'}}"> About</a> </li>
+            <li><a href="{{pathFor 'contact'}}"> Contact</a> </li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -56,6 +55,32 @@
     <div class="starter-template">
       <h1>GraffitiWall</h1>
       <p class="lead">The collaborative drawing app.</p>
+
+
+    </div>
+  </div><!-- /.container -->
+</template>
+
+
+<template name = "about">
+  <div class="container spacing">
+    <div class="starter-template">
+      <h1>GraffitiWall</h1>
+      <p class="lead">This is who we are.</p>
+
+      
+    </div>
+  </div><!-- /.container -->
+</template>
+
+
+<template name = "contact">
+  <div class="container spacing">
+    <div class="starter-template">
+      <h1>GraffitiWall</h1>
+      <p class="lead">Contact us.</p>
+
+      
     </div>
   </div><!-- /.container -->
 </template>
