@@ -20,3 +20,14 @@ biasport:facebook-sdk
 accounts-facebook
 
 twbs:bootstrap
+
+
+#router
+kadira:flow-router
+
+#Templating with flow router
+kadira:blaze-layout
+
+#adds pathFor and subsREadyhelpers
+arillo:flow-router-helpers
+
