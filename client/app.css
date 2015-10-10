@@ -14,23 +14,24 @@
 
 .red {
   background-color: red;
-
 }
 
 .orange{
   background-color: orange;
-
 }
 
 .yellow {
   background-color: yellow;
-
 }
+
 .blue {
   background-color: blue;
-
 }
+
 .green {
   background-color: green;
+}
 
+#svgCanvasContainer {
+  border: 1px solid black;
 }
