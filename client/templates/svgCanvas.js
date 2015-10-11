@@ -1,5 +1,6 @@
 /*** SETUP ***/
 var canvasContainerOffset = Session.get('svgCanvasContainerOffset');
+var wallId;
 
 Tracker.autorun(function() {
     canvasContainerOffset = Session.get('svgCanvasContainerOffset');
@@ -23,27 +24,25 @@ function resetCanvas() {
 
 /*** ONRENDERED ***/
 Template.svgCanvas.onRendered(function() {
-    var wallId = FlowRouter.getParam('wallId');
+    wallId = FlowRouter.getParam('wallId');
 
-    if (wallId) {
+    Meteor.call('clearCanvas', function() {
         resetCanvas();
-        Session.set('wallId', wallId);
-        Meteor.call('getCanvasForId', wallId, function(err, canvas) {
-            if (err) {
-                // TODO: Better error handling?
-                Alerts.set('Sorry, we couldn\'t find a wall with that id. A new canvas has been loaded instead.');
-                return FlowRouter.go('/wall/');
-            }
 
-            (canvas.circlePoints || []).forEach(function(circlePoint) {
-                insertCircle(circlePoint.x, circlePoint.y, circlePoint.lineColor);
+        if (wallId) {
+            Meteor.call('getCanvasForId', wallId, function (err, canvas) {
+                if (err) {
+                    // TODO: Better error handling?
+                    Alerts.set('Sorry, we couldn\'t find a wall with that id. A new canvas has been loaded instead.');
+                    return FlowRouter.go('/wall/');
+                }
+
+                (canvas.circlePoints || []).forEach(function (circlePoint) {
+                    insertCircle(circlePoint.x, circlePoint.y, circlePoint.lineColor);
+                });
             });
-        });
-    } else {
-        Meteor.call('clearCanvas', function() {
-            resetCanvas();
-        });
-    }
+        }
+    });
 });
 
 /*** EVENTS ***/
@@ -69,7 +68,7 @@ Template.svgCanvas.events({
                 break;
 
             case "save":
-                Meteor.call('saveCanvas', Session.get('wallId'), function(err, canvasId) {
+                Meteor.call('saveCanvas', wallId, function(err, canvasId) {
                     if (err) {
                         // TODO: Do something here.
                         return;
