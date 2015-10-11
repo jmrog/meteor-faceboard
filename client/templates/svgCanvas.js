@@ -7,10 +7,15 @@ Tracker.autorun(function() {
 });
 
 /*** UTILITY METHODS ***/
-function insertCircle(x, y, lineColor) {
+function insertCircle(x, y, lineColor, offsetAlreadyIncluded) {
+    if (!offsetAlreadyIncluded) {
+        x -= canvasContainerOffset.left;
+        y -= canvasContainerOffset.top;
+    }
+
     Meteor.call('insertCirclePoint', {
-        x: x - canvasContainerOffset.left,
-        y: y - canvasContainerOffset.top,
+        x: x,
+        y: y,
         lineColor: lineColor
     });
 }
@@ -38,7 +43,7 @@ Template.svgCanvas.onRendered(function() {
                 }
 
                 (canvas.circlePoints || []).forEach(function (circlePoint) {
-                    insertCircle(circlePoint.x, circlePoint.y, circlePoint.lineColor);
+                    insertCircle(circlePoint.x, circlePoint.y, circlePoint.lineColor, true);
                 });
             });
         }
