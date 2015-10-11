@@ -36,8 +36,7 @@ Template.svgCanvas.onRendered(function() {
 
         if (wallId) {
             Meteor.call('getCanvasForId', wallId, function (err, canvas) {
-                if (err) {
-                    // TODO: Better error handling?
+                if (err || !canvas) {
                     Alerts.set('Sorry, we couldn\'t find a wall with that id. A new canvas has been loaded instead.');
                     return FlowRouter.go('/wall/');
                 }
