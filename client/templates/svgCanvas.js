@@ -47,57 +47,40 @@ function resetCanvas() {
     Session.set('lineColor', 'black');
 }
 
-function startNewWall() {
-    var newWallId = Random.id();
-    Meteor.call('createCanvas', newWallId, function() {
-        FlowRouter.go('/wall/' + newWallId);
-    });
-}
-
 /*** ONRENDERED ***/
 Template.svgCanvas.onRendered(function() {
-    Meteor.startup(function() {
+    Tracker.autorun(function () {
+        canvasContainerOffset = Session.get('svgCanvasContainerOffset');
+    });
+    Tracker.autorun(function () {
+        // respond to route changes
+        var isNewWall = FlowRouter.getQueryParam('newWall') === 'true';
         wallId = FlowRouter.getParam('wallId');
 
-        if (!wallId) {
-            return startNewWall();
-        }
-
-        Tracker.autorun(function () {
-            canvasContainerOffset = Session.get('svgCanvasContainerOffset');
-        });
-        Tracker.autorun(function () {
-            Meteor.subscribe('canvas', wallId);
-        });
-        Tracker.autorun(function () {
-            var canvas = Canvas.findOne({_id: wallId});
-            if (canvas && canvas.circlePoints) {
+        Meteor.call('getCanvasForId', wallId, function (err, canvas) {
+            if (err || !canvas || !canvas.circlePoints) {
+                if (!isNewWall) {
+                    Alerts.set('Sorry, we couldn\'t find a wall with that id. A new canvas has been loaded instead.');
+                    FlowRouter.go('/wall');
+                }
+                resetCanvas();
+            } else {
+                resetCanvas();
                 drawPointsOnCanvas(canvas.circlePoints);
             }
         });
-
-        Session.set('svgCanvasContainerOffset', $('#svgCanvasContainer').offset());
-        Session.set('lineColor', 'black');
-
-        Meteor.call('clearCanvas', function () {
-            resetCanvas();
-
-            Meteor.call('getCanvasForId', wallId, function (err, canvas) {
-                if (err || !canvas) {
-                    Alerts.set('Sorry, we couldn\'t find a wall with that id. A new canvas has been loaded instead.');
-                    return startNewWall();
-                }
-
-                debugger;
-                drawPointsOnCanvas(canvas.circlePoints);
-                /*
-                 (canvas.circlePoints || []).forEach(function (circlePoint) {
-                 insertCircle(circlePoint.x, circlePoint.y, circlePoint.lineColor, true);
-                 });
-                 */
-            });
-        });
     });
+    Tracker.autorun(function() {
+        // This function controls the drawing itself.
+        var canvas = Canvas.findOne({ _id: wallId });
+        if (canvas && canvas.circlePoints) {
+            drawPointsOnCanvas(canvas.circlePoints);
+        }
+    });
+
+    canvasContainerOffset = $('#svgCanvasContainer').offset();
+    Session.set('svgCanvasContainerOffset', canvasContainerOffset);
+    Session.set('lineColor', 'black');
 });
 
 /*** EVENTS ***/
