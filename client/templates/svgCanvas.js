@@ -1,19 +1,39 @@
 /*** SETUP ***/
-var canvasContainerOffset = Session.get('svgCanvasContainerOffset');
+var canvasContainerOffset;
 var wallId;
 
-Tracker.autorun(function() {
-    canvasContainerOffset = Session.get('svgCanvasContainerOffset');
-});
+function drawPointsOnCanvas(points) {
+    if (points.length < 1) {
+        resetCanvas();
+    } else {
+        d3.select('#svgCanvasContainer svg')
+            .selectAll('circle')
+            .data(points)
+            .enter()
+            .append('circle')
+            .attr('r', 5)
+            .attr('cx', function (point) {
+                return point.x;
+            })
+            .attr('cy', function (point) {
+                return point.y;
+            })
+            .style('stroke', function (point) {
+                return point.lineColor;
+            })
+            .style('fill', function (point) {
+                return point.lineColor;
+            });
+    }
+}
 
-/*** UTILITY METHODS ***/
 function insertCircle(x, y, lineColor, offsetAlreadyIncluded) {
     if (!offsetAlreadyIncluded) {
         x -= canvasContainerOffset.left;
         y -= canvasContainerOffset.top;
     }
 
-    Meteor.call('insertCirclePoint', {
+    Meteor.call('insertCirclePoint', wallId, {
         x: x,
         y: y,
         lineColor: lineColor
@@ -27,25 +47,56 @@ function resetCanvas() {
     Session.set('lineColor', 'black');
 }
 
+function startNewWall() {
+    var newWallId = Random.id();
+    Meteor.call('createCanvas', newWallId, function() {
+        FlowRouter.go('/wall/' + newWallId);
+    });
+}
+
 /*** ONRENDERED ***/
 Template.svgCanvas.onRendered(function() {
-    wallId = FlowRouter.getParam('wallId');
+    Meteor.startup(function() {
+        wallId = FlowRouter.getParam('wallId');
 
-    Meteor.call('clearCanvas', function() {
-        resetCanvas();
+        if (!wallId) {
+            return startNewWall();
+        }
 
-        if (wallId) {
+        Tracker.autorun(function () {
+            canvasContainerOffset = Session.get('svgCanvasContainerOffset');
+        });
+        Tracker.autorun(function () {
+            Meteor.subscribe('canvas', wallId);
+        });
+        Tracker.autorun(function () {
+            var canvas = Canvas.findOne({_id: wallId});
+            if (canvas && canvas.circlePoints) {
+                drawPointsOnCanvas(canvas.circlePoints);
+            }
+        });
+
+        Session.set('svgCanvasContainerOffset', $('#svgCanvasContainer').offset());
+        Session.set('lineColor', 'black');
+
+        Meteor.call('clearCanvas', function () {
+            resetCanvas();
+
             Meteor.call('getCanvasForId', wallId, function (err, canvas) {
                 if (err || !canvas) {
                     Alerts.set('Sorry, we couldn\'t find a wall with that id. A new canvas has been loaded instead.');
-                    return FlowRouter.go('/wall/');
+                    return startNewWall();
                 }
 
-                (canvas.circlePoints || []).forEach(function (circlePoint) {
-                    insertCircle(circlePoint.x, circlePoint.y, circlePoint.lineColor, true);
-                });
+                debugger;
+                drawPointsOnCanvas(canvas.circlePoints);
+                /*
+                 (canvas.circlePoints || []).forEach(function (circlePoint) {
+                 insertCircle(circlePoint.x, circlePoint.y, circlePoint.lineColor, true);
+                 });
+                 */
             });
-        }
+        });
     });
 });
 
@@ -68,7 +119,7 @@ Template.svgCanvas.events({
 
         switch  (evt.target.id) {
             case "clear":
-                Meteor.call('clearCanvas', resetCanvas);
+                Meteor.call('clearCanvas', wallId, resetCanvas);
                 break;
 
             case "save":
